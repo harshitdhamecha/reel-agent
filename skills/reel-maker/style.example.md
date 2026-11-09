@@ -2,6 +2,7 @@
 
 This is an **example**, learned from one real user over 9 versions of a Goa (India) beach-trip reel that was posted.
 On first use, reel-maker copies it to `~/.claude/reel-agent/style.md` (personal, outside the plugin) and lets the user's feedback overwrite it.
+Everything below is a default. Tool ids (`lut_spark13`, `color_wide_lut24`, `SUNDAY MORNING`) are from the Nov 2026 Edits build; if `listFilters`/`listTextPresets` doesn't show them, pick the nearest and note it.
 
 ## Reference reel
 13.8 s · 28 beats (7 bars) at ~122 BPM · licensed dance track ("Jamaican (Bam Bam)" by HUGEL & SOLTO) starting on a downbeat inside its popular section ·
@@ -27,7 +28,7 @@ flash-montage opener · one static caption "<Place> diaries" + 🌴 🍹 🌅 �
 - **Recap tone, not invitation** for a trip already taken ("<Place> together?" felt wrong). **No dates** — footage mixed months.
 
 ## Structure & pacing (11–14 s)
-1. **Flash montage, first 4 beats:** ~14 shots, day + night mixed. Frame 1 = the prettiest still — it is the thumbnail.
+1. **Flash montage, first 4 beats:** ≈¼–½ beat per flash (8–14 shots depending on BPM; 8 × ½ beat reads cleanly at ~130 BPM), day + night mixed. Frame 1 = the prettiest still — it is the thumbnail.
 2. **Arrival** (plane window) 2 beats → **road POV** (scooter/car) 2 beats → **scenic** 1–2 beats.
 3. **Golden hour** stills/clips, 1 beat each → blue hour.
 4. **Night-in** beat → a black-and-white bridge shot (day→night).

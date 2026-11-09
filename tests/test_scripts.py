@@ -61,6 +61,47 @@ class BeatPlanTest(unittest.TestCase):
         self.assertEqual(beats, 4.0)
         self.assertEqual(total, round(4 * 0.49333 * 60))
 
+    def test_markers_file_raw_objects_and_window(self):
+        import json, tempfile
+        raw = {"estimatedBpm": 65.2, "markers": [
+            {"index": i, "sourceSeconds": 1.0 + 0.458 * i, "isDownbeat": i % 8 == 0} for i in range(0, 200, 2)]}
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+            json.dump(raw, f)
+        try:
+            m = beat_plan.load_markers(f.name, [40, 60])
+            self.assertTrue(m and all(40 <= t <= 60 for _, t in m))
+            p, ph = beat_plan.fit(m)
+            self.assertAlmostEqual(60 / p, 60 / 0.458, places=6)   # full tempo, not estimatedBpm
+            self.assertEqual(len(beat_plan.load_markers(f.name)), 100)
+        finally:
+            os.unlink(f.name)
+
+    def test_markers_file_accepts_pairs(self):
+        import json, tempfile
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+            json.dump([[0, 1.0], [2, 2.0]], f)
+        try:
+            self.assertEqual(beat_plan.load_markers(f.name), [[0, 1.0], [2, 2.0]])
+        finally:
+            os.unlink(f.name)
+
+    def test_place_mode_cumulative_frames(self):
+        # 131 BPM-ish period, 60 fps: placements must be contiguous and end on the cumulative grid.
+        period = 0.458
+        shots = [{"alias": "a", "beats": "1/2", "sourceIn": 3.2},
+                 {"alias": "b", "beats": "1/2", "sourceIn": 0},
+                 {"alias": "c", "beats": 2}]
+        pl, total, beats = beat_plan.plan_place(shots, period, 60)
+        self.assertEqual(beats, 3.0)
+        self.assertEqual(total, round(3 * period * 60))
+        self.assertEqual(pl[0]["aliasIds"], ["a"])
+        self.assertEqual(pl[0]["startTime"], 0)
+        self.assertAlmostEqual(pl[0]["sourceIn"], 3.2)
+        for prev, cur in zip(pl, pl[1:]):
+            self.assertAlmostEqual(prev["startTime"] + prev["sourceOut"] - prev["sourceIn"], cur["startTime"], places=6)
+        last = pl[-1]
+        self.assertAlmostEqual(last["startTime"] + last["sourceOut"] - last["sourceIn"], total / 60, places=6)
+
     def test_length_mismatch(self):
         with self.assertRaises(ValueError):
             beat_plan.plan_trims([{"id": "a", "start": 0, "end": 1}], [1, 1], 0.5)

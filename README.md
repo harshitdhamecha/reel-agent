@@ -4,7 +4,7 @@ A Claude Code plugin that turns a folder of footage and a one-line brief ("goa r
 
 Two skills:
 
-- **reel-maker** reads your footage, plans the shots in beats, builds the project in Edits, syncs every cut to the song's beat grid frame by frame, adds the caption, exports a 1080×1920 MP4 and checks it. It **learns your taste** from your feedback into a style profile, so reel #2 starts where reel #1 ended.
+- **reel-maker** reads your footage, plans the shots in beats, builds the project in Edits, syncs every cut to the song's beat grid frame by frame, adds the caption, exports a 1080×1920 MP4 (HEVC, as Edits exports) and checks it against the song's actual hits. It **learns your taste** from your feedback into a style profile, so reel #2 starts where reel #1 ended.
 - **trend-scout** finds top reels in a niche and works out the hook, cut pacing, caption style, length and song for each. It also reads a song's sound page to see whether the song is rising. It writes a dated trend note that reel-maker uses.
 
 ## What a session looks like
@@ -69,7 +69,7 @@ Your data lives in `~/.claude/reel-agent/`, which plugin updates never touch:
 python3 -I -m unittest discover -s tests
 ```
 
-`skills/reel-maker/scripts/beat_plan.py` fits the song's beat grid from the Edits beat markers. It then prints the exact trim for each clip so that every cut lands on a beat, rounded to whole frames without drift. `skills/trend-scout/scripts/shortcode.py` converts Instagram media IDs to shortcodes.
+`skills/reel-maker/scripts/beat_plan.py` fits the song's beat grid from the Edits beat markers. It then prints exact placements for a fresh build (or trims for an existing timeline) so that every cut lands on a beat, rounded to whole frames without drift. It reads the raw `beatMarkers` output directly (`markers_file` + `window`). `skills/trend-scout/scripts/shortcode.py` converts Instagram media IDs to shortcodes.
 
 ## License
 

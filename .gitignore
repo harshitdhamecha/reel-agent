@@ -17,3 +17,5 @@ contact_sheet
 photo_grid
 probe
 .DS_Store
+# local trial logs (contain machine paths)
+TRIAL-NOTES.md
