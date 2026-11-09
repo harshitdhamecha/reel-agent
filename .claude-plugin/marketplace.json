@@ -1,0 +1,20 @@
+{
+  "name": "reel-agent",
+  "metadata": {
+    "description": "A Claude Code reel bot: footage + a one-line brief in, a beat-synced reel in your style out."
+  },
+  "owner": {
+    "name": "Harshit Dhamecha"
+  },
+  "plugins": [
+    {
+      "name": "reel-agent",
+      "description": "reel-maker (builds reels in Meta's Edits via MCP, learns your style) + trend-scout (watches trending Instagram reels read-only).",
+      "author": {
+        "name": "Harshit Dhamecha"
+      },
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

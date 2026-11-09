@@ -1,0 +1,76 @@
+# reel-agent
+
+A Claude Code plugin that turns a folder of footage and a one-line brief ("goa reel") into a **beat-synced vertical reel in your own style**, built inside Meta's **Edits** app, and keeps an eye on what's trending on Instagram so the reels feel current.
+
+Two skills:
+
+- **reel-maker** reads your footage, plans the shots in beats, builds the project in Edits, syncs every cut to the song's beat grid frame by frame, adds the caption, exports a 1080×1920 MP4 and checks it. It **learns your taste** from your feedback into a style profile, so reel #2 starts where reel #1 ended.
+- **trend-scout** finds top reels in a niche and works out the hook, cut pacing, caption style, length and song for each. It also reads a song's sound page to see whether the song is rising. It writes a dated trend note that reel-maker uses.
+
+## What a session looks like
+
+```
+you:    ~/Movies/bali-trip  — make a bali reel
+claude: (contact sheets of every clip) 31 clips, 12 photos. Two are screenshots, skipping.
+        Thin on: road POV, food. Got any?
+        Plan: 13.6 s, 7 bars. Flash montage of 14 shots in 4 beats, then arrival, scooter,
+        rice terraces, golden hour, night, and a 4-beat ending hold.
+        Songs (you judge by ear):
+          1. <trending track> — on 3 of the top 5 Bali reels, 124 BPM, highlight at 0:41
+          2. <classic> — the song people tie to Bali
+        Building 1…
+        → ~/Movies/bali-reel/bali-reel-v1-<song>.mp4 (verified: 1080×1920, cuts within 1 frame of beats)
+you:    no zoom on the photos, and the caption feels too salesy
+claude: v2. Saved to your style profile: "no camera moves on photos; recap captions, not invitations".
+```
+
+## Install
+
+```
+/plugin marketplace add <github-user>/reel-agent
+/plugin install reel-agent@reel-agent
+```
+
+Or clone it and run `/plugin marketplace add ./reel-agent`.
+
+## Prerequisites
+
+| | Required | Notes |
+|---|---|---|
+| macOS + [Edits](https://www.instagram.com/edits/) (Meta's video editor) | yes | The editor the reels are built in. |
+| `metapilot-native` MCP server | yes | Third-party bridge that exposes Edits to Claude (default `http://127.0.0.1:19501/mcp`). Not made by Meta or Anthropic. |
+| Xcode command-line tools (`swiftc`) | recommended | For the footage contact-sheet helpers. |
+| [Nimble](https://nimbleway.com) MCP | optional | Logged-out reel metadata and MP4s for trend-scout (paid credits). |
+| [Playwright MCP](https://github.com/microsoft/playwright-mcp) with its own `--user-data-dir` | optional | Logged-in trend discovery with a **secondary** Instagram account. |
+| `ffmpeg`, `yt-dlp`, Python 3 | optional | Fallback analysis, YouTube Shorts, and the beat planner (`python3`). |
+
+Your data lives in `~/.claude/reel-agent/`, which plugin updates never touch:
+- `style.md`: your learned style, created on your first reel from `skills/reel-maker/style.example.md`.
+- `trends/`: dated trend notes.
+- `config.md`: the confirmed secondary account, if you set one up.
+
+## Limitations
+
+- **Claude can't hear.** It shortlists songs by data: what top reels use, how many reels use a sound, tempo, and whether the beat grid is steady. **You** pick by ear. Exports are checked for audio levels and onset timing, not for taste.
+- It only works with the Edits app on macOS, through a third-party MCP bridge whose tools may change.
+- Music comes from the Edits licensed library. Royalty-free downloads there were unreliable when tested.
+- The tools for scraping trends break when sites change. The skill lists fallbacks, but expect to fix things now and then.
+
+## Safety and terms
+
+- **It never automates your main Instagram account.** Logged-in discovery uses a separate browser profile, and **you** log in to a secondary account yourself. The skill reads back the username and asks you to confirm before it uses that account.
+- Browsing is read-only: no likes, follows, comments, DMs or posts. It also keeps volume low, about 5–10 reels per run.
+- **Automated access and scraping may violate Instagram's Terms of Use**, and third-party scraping services have their own terms. You are responsible for how you use this. Downloaded reels are for analysis only, so don't redistribute other creators' content.
+- Music licensing is handled by Edits and Instagram. Publish from Edits, or add the same licensed song inside Instagram.
+
+## Development
+
+```
+python3 -I -m unittest discover -s tests
+```
+
+`skills/reel-maker/scripts/beat_plan.py` fits the song's beat grid from the Edits beat markers. It then prints the exact trim for each clip so that every cut lands on a beat, rounded to whole frames without drift. `skills/trend-scout/scripts/shortcode.py` converts Instagram media IDs to shortcodes.
+
+## License
+
+MIT, © Harshit Dhamecha

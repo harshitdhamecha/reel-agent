@@ -1,0 +1,19 @@
+# media and scratch output
+*.mp4
+*.mov
+*.m4a
+*.jpg
+*.jpeg
+*.png
+*.heic
+trend-lab/
+.playwright-mcp/
+# personal style profile learned on your machine
+style.md
+# python / swift build output
+__pycache__/
+*.pyc
+contact_sheet
+photo_grid
+probe
+.DS_Store
