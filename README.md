@@ -36,7 +36,7 @@ claude: v2. Saved to your style profile: "no camera moves on photos; recap capti
 ## Install
 
 ```
-/plugin marketplace add <github-user>/reel-agent
+/plugin marketplace add harshitdhamecha/reel-agent
 /plugin install reel-agent@reel-agent
 ```
 
