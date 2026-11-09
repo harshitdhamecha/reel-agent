@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "reel-agent",
-      "description": "reel-maker (builds reels in Meta's Edits via MCP, learns your style) + trend-scout (watches trending Instagram reels read-only).",
+      "description": "reel-maker (builds beat-synced reels in Meta's Edits via MCP) + style-coach (learns your style from your reels and feedback) + trend-scout (watches trending Instagram reels read-only).",
       "author": {
         "name": "Harshit Dhamecha"
       },

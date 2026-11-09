@@ -2,10 +2,19 @@
 
 A Claude Code plugin that turns a folder of footage and a one-line brief ("goa reel") into a **beat-synced vertical reel in your own style**, built inside Meta's **Edits** app, and keeps an eye on what's trending on Instagram so the reels feel current.
 
-Two skills:
+Three skills:
 
 - **reel-maker** reads your footage, plans the shots in beats, builds the project in Edits, syncs every cut to the song's beat grid frame by frame, adds the caption, exports a 1080×1920 MP4 (HEVC, as Edits exports) and checks it against the song's actual hits. It **learns your taste** from your feedback into a style profile, so reel #2 starts where reel #1 ended.
+- **style-coach** trains the agent on **your** taste: give it a few reels you made or love and it measures them (cut pacing in beats, flash-montage opener, tempo, on-beat accuracy, colour warmth, caption placement, fade-out), asks up to 6 quick questions, and writes your style profile. After every reel it records what you changed or approved, in your words.
 - **trend-scout** finds top reels in a niche and works out the hook, cut pacing, caption style, length and song for each. It also reads a song's sound page to see whether the song is rising. It writes a dated trend note that reel-maker uses.
+
+## Train it on your style
+
+1. Export or save 3–5 reels you made (or love) as MP4s, e.g. in `~/Movies/my-reels/`.
+2. Tell Claude: **"learn my style from ~/Movies/my-reels"**. style-coach measures each reel (`skills/style-coach/scripts/analyze_reel.py`, ffmpeg only), looks at the frames, and asks ≤ 6 questions (vibe, caption tone, music, camera moves, people vs scenery, length).
+3. It writes `~/.claude/reel-agent/style.md`, with every rule tagged by its evidence ("user said", "measured: 3/3 reels", "feedback on v2"). Your words always beat measurements. Every reel after that starts from this profile, and your feedback keeps refining it.
+
+No reels yet? Say "set up my reel style" and it runs the interview on top of the example profile.
 
 ## What a session looks like
 
@@ -42,10 +51,11 @@ Or clone it and run `/plugin marketplace add ./reel-agent`.
 | Xcode command-line tools (`swiftc`) | recommended | For the footage contact-sheet helpers. |
 | [Nimble](https://nimbleway.com) MCP | optional | Logged-out reel metadata and MP4s for trend-scout (paid credits). |
 | [Playwright MCP](https://github.com/microsoft/playwright-mcp) with its own `--user-data-dir` | optional | Logged-in trend discovery with a **secondary** Instagram account. |
-| `ffmpeg`, `yt-dlp`, Python 3 | optional | Fallback analysis, YouTube Shorts, and the beat planner (`python3`). |
+| `ffmpeg`, Python 3 | recommended | style-coach's reel analyzer and the beat planner (`python3`). |
+| `yt-dlp` | optional | YouTube Shorts for trend checks. |
 
 Your data lives in `~/.claude/reel-agent/`, which plugin updates never touch:
-- `style.md`: your learned style, created on your first reel from `skills/reel-maker/style.example.md`.
+- `style.md`: your learned style, written by style-coach (or created on your first reel from `skills/reel-maker/style.example.md`).
 - `trends/`: dated trend notes.
 - `config.md`: the confirmed secondary account, if you set one up.
 
@@ -69,7 +79,7 @@ Your data lives in `~/.claude/reel-agent/`, which plugin updates never touch:
 python3 -I -m unittest discover -s tests
 ```
 
-`skills/reel-maker/scripts/beat_plan.py` fits the song's beat grid from the Edits beat markers. It then prints exact placements for a fresh build (or trims for an existing timeline) so that every cut lands on a beat, rounded to whole frames without drift. It reads the raw `beatMarkers` output directly (`markers_file` + `window`). `skills/trend-scout/scripts/shortcode.py` converts Instagram media IDs to shortcodes.
+`skills/reel-maker/scripts/beat_plan.py` fits the song's beat grid from the Edits beat markers. It then prints exact placements for a fresh build (or trims for an existing timeline) so that every cut lands on a beat, rounded to whole frames without drift. It reads the raw `beatMarkers` output directly (`markers_file` + `window`). `skills/style-coach/scripts/analyze_reel.py` measures a finished reel with ffmpeg only: cuts (brightness-normalised frame correlation), flash bursts, tempo, a half-beat grid fitted to the cuts (BPM, beat structure, off-grid cuts), grade numbers and fade-out; its test builds a synthetic reel with known cuts and a 120 BPM click. `skills/trend-scout/scripts/shortcode.py` converts Instagram media IDs to shortcodes.
 
 ## License
 

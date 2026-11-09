@@ -93,7 +93,8 @@ metapilot-native is not made by Meta or Anthropic. Its tool names and behaviour 
 Short: file path, project name, what changed, what to check by ear, and a **Flagged** list (skipped files, judgement calls made without the user). Remind: publish from Edits, or add the same song inside Instagram so the reel joins the song's audio page.
 
 ## Learning the user's style
-- After every round of feedback, record the **taste** in `~/.claude/reel-agent/style.md` (what they kept, rejected, and why, in their words) and **mechanics** (tool quirks) in this file's relevant section. Mark the posted version as the reference reel.
+- After every round of feedback, and when the user says a version was posted, **run the style-coach skill in feedback mode**: it records the taste in `~/.claude/reel-agent/style.md` (in the user's words, with evidence; contradicted rules are revised, not duplicated) and, for a posted reel, measures the export with `analyze_reel.py` to set it as the reference reel. Mechanics (tool quirks) go in this file's relevant section.
+- New user with reels they already made or love? Suggest style-coach's **learn** mode before the first build.
 - Treat style.md as defaults, not laws: when footage or a brief pulls another way, propose the change in one line.
 
 ## Generic playbook (rules of thumb from creator/vendor blogs, 2026)
