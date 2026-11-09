@@ -40,7 +40,10 @@ Best → worst (as of late 2026; sites change — re-check if one fails):
 - **Logged-in route (secondary-account browser):**
   - `instagram.com/explore/tags/<tag>/` redirects to keyword search; wait ~4 s, save the snapshot to a file, grep `/p/<shortcode>` (~20 posts, mixed ages; newer shortcodes sort later alphabetically within a length).
   - `/reel/<code>/` opens the Reels viewer: snapshot gives creator, caption, **likes, comments, reposts, shares** (button labels in that order) and the song link `/reels/audio/<id>/` labelled "Artist · Title". The viewer preloads the next feed reels — ignore those (the feed is personalised to the account).
-  - `/reels/audio/<id>/` = **sound page: "N reels" using the song + view counts of top reels on it.** Its text isn't in the accessibility snapshot — take a screenshot and read it. Best "is this song trending" signal: a rising reel count and niche reels using it.
+  - `/reels/audio/<id>/` = **sound page: "N reels" using the song + view counts of top reels on it.** Not in the accessibility snapshot, but in `main.innerText` (regex `([\d.,]+[KM]?)\s+reels`). Best "is this song trending" signal: reel count + top views + niche reels using it.
+  - **Batch it** (one call): `browser_run_code_unsafe` with an async loop — `page.goto` each URL, `page.waitForTimeout(5000 + random*3000)`, `page.evaluate(fn)`. `require` is unavailable there, so inline the function from `scripts/reel_extract.js`. Tag pages: collect `a[href*="/p/"]` hrefs via evaluate. Keep to ~10 reel pages per run.
+  - Then check each song in Edits: `searchMusic` + `getMusicTrackDetails` (popular segments) — feeds reel-maker's song shortlist.
+  - Empty `song` = the creator's original audio.
 - **YouTube Shorts:** `yt-dlp` downloads public Shorts — useful for cross-platform format checks.
 - Known broken (late 2026): Nimble `instagram_audio_page` template (returns empty), picmany (Cloudflare), jolygram via Nimble (times out).
 
