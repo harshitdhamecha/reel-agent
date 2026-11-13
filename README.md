@@ -1,12 +1,13 @@
 # reel-agent
 
-A Claude Code plugin that turns a folder of footage and a one-line brief ("goa reel") into a **beat-synced vertical reel in your own style**, built inside Meta's **Edits** app, and keeps an eye on what's trending on Instagram so the reels feel current.
+A Claude Code plugin that turns a folder of footage and a one-line brief ("goa reel") into a **beat-synced vertical reel in your own style**, built inside Meta's **Edits** app, keeps an eye on what's trending on Instagram so the reels feel current, and **clips long videos (streams, podcasts, gameplay) into captioned Shorts/Reels**.
 
-Three skills:
+Four skills:
 
 - **reel-maker** reads your footage, plans the shots in beats, builds the project in Edits, syncs every cut to the song's beat grid frame by frame, adds the caption, exports a 1080×1920 MP4 (HEVC, as Edits exports) and checks it against the song's actual hits. It **learns your taste** from your feedback into a style profile, so reel #2 starts where reel #1 ended.
 - **style-coach** trains the agent on **your** taste: give it a few reels you made or love and it measures them (cut pacing in beats, flash-montage opener, tempo, on-beat accuracy, colour warmth, caption placement, fade-out), asks up to 6 quick questions, and writes your style profile. After every reel it records what you changed or approved, in your words.
 - **trend-scout** finds top reels in a niche and works out the hook, cut pacing, caption style, length and song for each. It also reads a song's sound page to see whether the song is rising. It writes a dated trend note that reel-maker uses.
+- **clip-maker** turns a long video (stream VOD, podcast, gameplay, talk) into 3–5 vertical clips: transcribes it (whisper.cpp or Edits), ranks moments by hook, payoff and loudness peaks (`find_moments.py`), cuts with jump cuts, reframes (talking head, facecam-over-gameplay stack, gameplay crop), adds word-by-word captions and a hook, normalises speech loudness, and exports with a sidecar recording the source and **permission basis** (clipping campaign, creator policy or Creative Commons). It never re-uploads trailers raw.
 
 ## Train it on your style
 
@@ -52,7 +53,8 @@ Or clone it and run `/plugin marketplace add ./reel-agent`.
 | [Nimble](https://nimbleway.com) MCP | optional | Logged-out reel metadata and MP4s for trend-scout (paid credits). |
 | [Playwright MCP](https://github.com/microsoft/playwright-mcp) with its own `--user-data-dir` | optional | Logged-in trend discovery with a **secondary** Instagram account. |
 | `ffmpeg`, Python 3 | recommended | style-coach's reel analyzer and the beat planner (`python3`). |
-| `yt-dlp` | optional | YouTube Shorts for trend checks. |
+| `yt-dlp` | optional (required for clip-maker URLs) | Downloads VOD sections for clip-maker; YouTube Shorts for trend checks. |
+| `whisper.cpp` (`brew install whisper-cpp` + a `ggml-base.bin` model) | recommended for clip-maker | Fast transcripts of long videos; Edits `transcribeClip` works without it, slower. |
 
 Your data lives in `~/.claude/reel-agent/`, which plugin updates never touch:
 - `style.md`: your learned style, written by style-coach (or created on your first reel from `skills/reel-maker/style.example.md`).

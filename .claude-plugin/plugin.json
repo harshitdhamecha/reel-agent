@@ -1,7 +1,7 @@
 {
   "name": "reel-agent",
   "version": "0.1.0",
-  "description": "Turn a folder of footage into beat-synced vertical reels in Meta's Edits app, in a style it learns from your own reels and feedback, informed by what's trending on Instagram.",
+  "description": "Turn a folder of footage into beat-synced vertical reels in Meta's Edits app, in a style it learns from your own reels and feedback, informed by what's trending on Instagram — and clip long streams, podcasts and gameplay into captioned Shorts/Reels.",
   "author": {
     "name": "Harshit Dhamecha"
   },
@@ -15,7 +15,9 @@
     "beat-sync",
     "trends",
     "content-creation",
-    "style-learning"
+    "style-learning",
+    "clipping",
+    "youtube-shorts"
   ],
   "skills": "./skills/"
 }

@@ -19,3 +19,4 @@ probe
 .DS_Store
 # local trial logs (contain machine paths)
 TRIAL-NOTES.md
+CLIP-TRIAL-NOTES.md
