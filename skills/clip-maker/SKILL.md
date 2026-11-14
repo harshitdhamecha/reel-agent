@@ -25,7 +25,13 @@ Mechanics shared with reel-maker (Edits screens, `appState`, `convertToMain` noi
 ## 1. Source → `~/Movies/clips/<project>/`
 - Long VODs: download **only the sections you need**:
   `yt-dlp -f "bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080]" --merge-output-format mp4 --download-sections "*HH:MM:SS-HH:MM:SS" -o "src-<id>.%(ext)s" <url>`
-  Section downloads re-encode through ffmpeg and run roughly **0.7× real time** (10 min took ~7 min). For a 6-hour stream, first pick windows from chat-spike/timestamp comments or a low-res audio-only pass (`-f ba`, transcribe, `find_moments`), then download just those windows at 1080p.
+  Section downloads re-encode through ffmpeg and run roughly **0.7× real time** (10 min took ~7 min). Never download a whole long stream: pick windows first (below), then download just those at 1080p.
+- **Pick windows without downloading — `scripts/stream_moments.py <youtube-url>`** (~15 s for a 3–11 h VOD). Viewers already marked the moments:
+  - **Timestamp comments** (top 300–400 comments; 1–2 timestamps each; likes on a log scale; navigation comments like "match starts from here" demoted) — exact to the second and the comment text is a ready hook idea ("7:43:08 the switch from 😂 to 🤨 is hilarious", 170 likes).
+  - **Most-replayed heatmap** — 100 bins over the video (≈ 2 min bins on 3 h, ≈ 7 min on 11 h): coarse, so transcribe that window to find the exact beat. Appears once the video has enough views (hours, not minutes).
+  - **Live-chat spikes** (`--chat <id>.live_chat.json` from `yt-dlp --skip-download --write-subs --sub-langs live_chat <url>`) — the only signal right after a stream ends. Slow to fetch (3.4 h Hindi stream: ~150 MB, ~12 min) and modest on huge chats (peaks ~1.7× median), so run it in the background.
+  - Output: windows ranked by score with a ready `--download-sections` string, chapter and hook idea. Read the hook ideas yourself; still confirm each window from its transcript.
+  - Twitch/Kick: use the channel's top clips (`yt-dlp --flat-playlist "https://www.twitch.tv/<user>/clips?filter=clips&range=24hr"` → view counts) as the moment list.
 - Edits can only read `~/Movies` — stage there.
 - Write `sidecar.json`: `{source_url, creator, permission, section, clips:[{file, source_in:[[a,b],…], layout, hook}]}`. Times in the sidecar are relative to the downloaded section; note the section offset.
 
@@ -66,6 +72,16 @@ YouTube's reused-content policy and Instagram's originality ranking both demote 
 
 ## 7. Hand-off
 Clip paths + one line each (moment, hook, layout, length), sidecar path, flags (spoilers, weak audio, soft upscales), and what to post where. Measured on the trial (Nov 2026, Apple silicon): 10-min section download ~7 min; whisper 17 s; moment ranking < 1 s; build + export ~2–3 min per clip once the layout is known.
+
+## Always-on clipping (how pro clippers scale)
+1. **Watchlist** of permitted sources, one niche per output account (campaign briefs name the streamer's handle): `sources.json` `[{channel_url, platform, permission, campaign, language, account}]`.
+2. **Poll** each channel for new VODs/streams (`yt-dlp --flat-playlist -I 1:5 --print "%(id)s|%(title)s|%(duration)s" <channel>/streams`), skip ids already in the log.
+3. **Rank** with `stream_moments.py` (chat right after the stream; re-run after ~12–24 h when comments + heatmap fill in for a second batch).
+4. **Download only the top windows**, build 3–5 clips per stream with different hooks, export, verify.
+5. **Queue** files + caption + hashtags + campaign tag for posting; post within hours of the stream (first clips of a moment win). Posting stays a human/approved step unless the user authorises an official API (YouTube Data API upload; Instagram Graph API publishing on a Business/Creator account) — never browser bots, never the user's main account.
+6. **Track**: views per clip at 24 h / 72 h → feed back which hooks/streamers pay; submit to the campaign within ~30 min of posting.
+- Volume pros run: 3–5 posts per account per day, several single-niche accounts. Don't post the same clip on several accounts (duplicate/spam flags; campaigns pay once per clip).
+- Money: campaign budgets drain fast, per-clip caps limit a viral clip (e.g. $35 cap at $0.70/1K), most gaming briefs want Tier-1 (US/UK/CA/AU) viewers — English clips of US streamers earn; Hindi clips grow reach but rarely pay.
 
 ## Launch-week playbook (big game releases, e.g. GTA VI on 19 Nov 2026)
 - Before launch: line up sources with permission (streamer clipping campaigns, creators with open clipping policies); prepare the project template (stack layout + caption style + hook style) so day-one clips take minutes.
